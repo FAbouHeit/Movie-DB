@@ -46,12 +46,12 @@ app.get('/movies/create', (req,res)=>{
 })
 
 app.get('/movies/read', (req,res)=>{
-    let displayMovies =[]
-     movies.forEach(element => {
-    displayMovies.push(element.title)    
-    });
+    // let displayMovies =[]
+    //  movies.forEach(element => {
+    // displayMovies.push(element.title)    
+    // });
     // displayMovies.trim()
-    res.status(200).json({status:200, data: displayMovies })
+    res.status(200).json({status:200, data: movies })
 })
 
 app.get('/movies/update', (req,res)=>{
@@ -69,5 +69,19 @@ const movies = [
     // { title: 'الإرهاب والكباب‎', year: 1992, rating: 6.2 }
     { title: 'الإرهاب والكباب', year: 1992, rating: 6.2 }
 ]
+
+app.get('/movies/read/by-date', (req,res)=>{
+    let displayMovies =movies.so
+     
+    // displayMovies.trim()
+    res.status(200).json({status:200, data: displayMovies })
+})
+app.get('/movies/read/by-rating', (req,res)=>{
+    
+})
+app.get('/movies/read/by-title', (req,res)=>{
+    
+})
+
 
 app.listen(3002);
