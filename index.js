@@ -90,10 +90,35 @@ app.get('/movies/read/id/:id', (req,res)=>{
     let movieSelected;
     if(req.params.id > movies.length || req.params.id <1)
         
-        res.status(200).json({status:404, error:true, message:`the movie ${req.params.moviename} does not exist`})
+        res.status(404).json({status:404, error:true, message:`the movie ${req.params.moviename} does not exist`})
     else {
         movieSelected = movies[req.params.id-1]
         res.status(200).json({status:200, data: movieSelected})
     }
+})
+
+
+app.get('/movies/add', (req,res)=>{
+   
+    let mynewtitle=req.query.title;
+    let mynewyear = parseInt(req.query.year);
+    let mynewrating = parseFloat(req.query.rating) || 4;
+   
+  
+    if(!req.query.title || !req.query.year){
+        res.status(403).json({status:403, error:true, 
+            message:'you cannot create a movie without providing a title and a year'})
+    }
+   else if(req.query.year.length !==4 || isNaN(req.query.year)){
+            res.status(403).json({status:403, error:true, 
+                message:'you cannot create a movie without providing a title and a year'})
+    }
+  else  if(mynewrating>10 || mynewrating<0) {
+        mynewrating=4;
+    }
+        const newmovie = {title : mynewtitle, year:mynewyear, rating: mynewrating}
+        movies.push(newmovie)
+        res.json(movies)
+
 })
 app.listen(3002);
