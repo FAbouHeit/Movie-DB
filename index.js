@@ -77,7 +77,7 @@ app.get('/movies/read/by-date', (req,res)=>{
     res.status(200).json({status:200, data: displayMovies })
 })
 app.get('/movies/read/by-rating', (req,res)=>{
-    let displayMovies =movies.sort((one, two)=>one.rating-two.rating)
+    let displayMovies =movies.sort((one, two)=>two.rating-one.rating)
     res.status(200).json({status:200, data: displayMovies })
 })
 app.get('/movies/read/by-title', (req,res)=>{
@@ -86,4 +86,14 @@ app.get('/movies/read/by-title', (req,res)=>{
 })
 
 
+app.get('/movies/read/id/:id', (req,res)=>{
+    let movieSelected;
+    if(req.params.id > movies.length || req.params.id <1)
+        
+        res.status(200).json({status:404, error:true, message:`the movie ${req.params.moviename} does not exist`})
+    else {
+        movieSelected = movies[req.params.id-1]
+        res.status(200).json({status:200, data: movieSelected})
+    }
+})
 app.listen(3002);
