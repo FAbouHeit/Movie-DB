@@ -71,16 +71,18 @@ const movies = [
 ]
 
 app.get('/movies/read/by-date', (req,res)=>{
-    let displayMovies =movies.so
+    let displayMovies =movies.sort((one, two)=>one.year-two.year)
      
     // displayMovies.trim()
     res.status(200).json({status:200, data: displayMovies })
 })
 app.get('/movies/read/by-rating', (req,res)=>{
-    
+    let displayMovies =movies.sort((one, two)=>one.rating-two.rating)
+    res.status(200).json({status:200, data: displayMovies })
 })
 app.get('/movies/read/by-title', (req,res)=>{
-    
+    let displayMovies =movies.sort((one, two)=>one.title.localeCompare(two.title))
+    res.status(200).json({status:200, data: displayMovies })
 })
 
 
