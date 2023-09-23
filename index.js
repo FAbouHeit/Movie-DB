@@ -1,8 +1,17 @@
 const express = require('express');
 const app = express();
+// app.use(express.json);
 
 const time = new Date();
 const timeDisplay = `${time.getHours()}:${time.getSeconds()}`
+
+const movies = [
+    { title: 'Jaws', year: 1975, rating: 8 },
+    { title: 'Avatar', year: 2009, rating: 7.8 },
+    { title: 'Brazil', year: 1985, rating: 8 },
+    // { title: 'الإرهاب والكباب‎', year: 1992, rating: 6.2 }
+    { title: 'الإرهاب والكباب', year: 1992, rating: 6.2 }
+]
 
 app.get('/', (req,res)=>{
     console.log("here")
@@ -23,13 +32,7 @@ app.get('/hello/:ID?', (req,res)=>{
     res.json({status: 200, message: `Hello ${req.params.ID}`})
 })
 
-// app.get('/search?s=:Search?', (req,res)=>{
-//     if(req.params.Search) 
-//     res.status(200).json({status:200, message: "ok", data: `${req.params.Search}`})
-//     else
-//     res.status(500).json({status:500, error: true,message:"you have to provide a search"})
-   
-// })
+
 
 
 app.get('/search', (req,res)=>{
@@ -62,13 +65,7 @@ app.get('/movies/delete', (req,res)=>{
     
 })
 
-const movies = [
-    { title: 'Jaws', year: 1975, rating: 8 },
-    { title: 'Avatar', year: 2009, rating: 7.8 },
-    { title: 'Brazil', year: 1985, rating: 8 },
-    // { title: 'الإرهاب والكباب‎', year: 1992, rating: 6.2 }
-    { title: 'الإرهاب والكباب', year: 1992, rating: 6.2 }
-]
+
 
 app.get('/movies/read/by-date', (req,res)=>{
     let displayMovies =movies.sort((one, two)=>one.year-two.year)
@@ -103,6 +100,8 @@ app.get('/movies/add', (req,res)=>{
     let mynewtitle=req.query.title;
     let mynewyear = parseInt(req.query.year);
     let mynewrating = parseFloat(req.query.rating) || 4;
+    // const newmovie = {title : mynewtitle, year:mynewyear, rating: mynewrating}
+    // const  {title, year, rating} = req.body
    
   
     if(!req.query.title || !req.query.year){
@@ -116,8 +115,9 @@ app.get('/movies/add', (req,res)=>{
   else  if(mynewrating>10 || mynewrating<0) {
         mynewrating=4;
     }
-        const newmovie = {title : mynewtitle, year:mynewyear, rating: mynewrating}
+         const newmovie = {title : mynewtitle, year:mynewyear, rating: mynewrating}
         movies.push(newmovie)
+        // res.json(newmovie)
         res.status(200).json(movies)
 
 })
@@ -139,12 +139,13 @@ app.get('/movies/update/:id', (req,res)=>{
 
     let mynewtitle=req.query.title;
     let mynewyear = parseInt(req.query.year);
-    let mynewrating = parseFloat(req.query.rating) || 4;
+    console.log(typeof(mynewyear), mynewyear)
+    let mynewrating = parseFloat(req.query.rating);
     // console.log(mynewrating)
-    if(mynewyear && mynewyear.length!=4){
-        return   res.status(500).json({status:403, error:true, 
-            message:'you cannot edit a movie with such year'})
-    }
+    // if(mynewyear && mynewyear.length!=4){
+    //     return   res.status(404).json({status:404, error:true, 
+    //         message:'you cannot edit a movie with such year'})
+    // }
 
     // console.log(indexSelected)
     if(indexSelected>movies.length || indexSelected<1){
@@ -153,10 +154,10 @@ app.get('/movies/update/:id', (req,res)=>{
      if(req.query.title){
         movies[indexSelected-1].title = mynewtitle;
     } 
-     if(req.query.year){
+     if(req.query.year && req.query.year.length ===4){
         movies[indexSelected-1].year = mynewyear;
     } 
-     if(mynewrating){
+     if(mynewrating != undefined && mynewrating>=0 && mynewrating <11){
         movies[indexSelected-1].rating = mynewrating;
     }
 }
