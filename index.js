@@ -134,6 +134,36 @@ app.get('/movies/delete/:id', (req,res)=>{
     }
 })
 
+app.get('/movies/update/:id', (req,res)=>{
+    let indexSelected = parseInt(req.params.id)
+
+    let mynewtitle=req.query.title;
+    let mynewyear = parseInt(req.query.year);
+    let mynewrating = parseFloat(req.query.rating) || 4;
+    // console.log(mynewrating)
+    if(mynewyear && mynewyear.length!=4){
+        return   res.status(500).json({status:403, error:true, 
+            message:'you cannot edit a movie with such year'})
+    }
+
+    // console.log(indexSelected)
+    if(indexSelected>movies.length || indexSelected<1){
+        res.status(404).json({status:404, error:true, message:'the movie <ID> does not exist'})
+    } else{
+     if(req.query.title){
+        movies[indexSelected-1].title = mynewtitle;
+    } 
+     if(req.query.year){
+        movies[indexSelected-1].year = mynewyear;
+    } 
+     if(mynewrating){
+        movies[indexSelected-1].rating = mynewrating;
+    }
+}
+
+    res.status(200).json(movies)
+})
+
 
 
 app.listen(3002);
