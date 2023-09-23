@@ -118,7 +118,22 @@ app.get('/movies/add', (req,res)=>{
     }
         const newmovie = {title : mynewtitle, year:mynewyear, rating: mynewrating}
         movies.push(newmovie)
-        res.json(movies)
+        res.status(200).json(movies)
 
 })
+
+
+app.get('/movies/delete/:id', (req,res)=>{
+    let indexSelected = parseInt(req.params.id)
+    // console.log(indexSelected)
+    if(indexSelected>movies.length || indexSelected<1){
+        res.status(404).json({status:404, error:true, message:'the movie <ID> does not exist'})
+    } else{
+        movies.splice(indexSelected-1, 1);
+        res.status(200).json(movies)
+    }
+})
+
+
+
 app.listen(3002);
