@@ -1,10 +1,75 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
 // app.use(express.json);
 
 const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+
+
+app.listen(3002, () =>{
+    console.log("Server is running");
+});
+
+
+
+const uri = "mongodb+srv://fabouheit:2upvaGWizBSySqeB@cluster0.ykbmtqg.mongodb.net/?retryWrites=true&w=majority";
+
+(async ()=>{
+    try{
+        await mongoose.connect(uri,{
+            useNewUrlParser:true,
+            useUnifiedTopology:true
+        })
+        console.log("connected to db");
+        
+    }
+    catch(error){
+        console.log(error);
+    }
+})();
+
+// const { MongoClient, ServerApiVersion } = require('mongodb');
+
+// // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+
+// async function run() {
+//   try {
+//     // Connect the client to the server	(optional starting in v4.7)
+//     await client.connect();
+//     // Send a ping to confirm a successful connection
+//     await client.db("admin").command({ ping: 1 });
+//     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+//   } finally {
+//     // Ensures that the client will close when you finish/error
+//     await client.close();
+//   }
+// }
+// run().catch(console.dir);
+
+
+
+
+const movieSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    year: { type: Number, required: true },
+    rating: { type: Number , required: true},
+  });
+  
+  // Create a User model using the schema
+  const Movie = mongoose.model('movie', movieSchema);
+
+
+
 
 ///////////////////
 
@@ -62,6 +127,39 @@ app.get('/movies/read', (req,res)=>{
     // displayMovies.trim()
     res.status(200).json({status:200, data: movies })
 })
+////////////////////////////////////////////////////////////
+app.get('/movies', async (req,res)=>{
+    // let indexSelected = req.params.id;
+   
+    
+    try{
+        const myMovieDB= await Movie.find();
+        res.json(myMovieDB)
+    }catch(error){
+        res.json({status:404,error:true,message:"error reading"})
+        console.log(error)
+    }
+    
+  })
+
+////////////////////////////////////////////////////////////
+// app.get('/movies/read', async (req, res) => {
+//     const db = client.db(); // Get the database instance
+//     const collection = db.collection('your_collection'); // Replace with your collection name
+  
+//     // const objectId = new ObjectId(req.params.id);
+  
+//     // Find a document by its ObjectId
+//     const document = await collection.findOne({ _id: objectId });
+  
+//     if (!document) {
+//       return res.status(404).json({ message: 'Document not found' });
+//     }
+  
+//     res.json(document);
+//   });
+////////////////////////////////////////////////////////////
+
 
 app.get('/movies/update', (req,res)=>{
     
@@ -100,6 +198,11 @@ app.get('/movies/read/id/:id', (req,res)=>{
     }
 })
 
+////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////
 
 app.get('/movies/add', (req,res)=>{
    
@@ -163,6 +266,34 @@ else{
 }
 })
 
+////////////////////////////////////////////////////////////////////////
+app.post('/movies',(req,res)=>{
+
+    const movie= new Movie({
+    title : req.body.title,
+    year : req.body.year,
+    rating : req.body.rating
+    })
+
+    movie.save().then(
+        () => res.json({status:200,message:"done successfully"}),
+        (error) => {
+            console.log(error)
+            res.json({status:404,error:true,message:"error"})
+        }
+    )
+    
+  })
+
+///////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
 
 app.get('/movies/delete/:id', (req,res)=>{
     let indexSelected = parseInt(req.params.id)
@@ -185,6 +316,25 @@ app.delete('/movies/delete/:id', (req,res)=>{
         res.status(200).json(movies)
     }
 })
+
+////////////////////////////////////////////////////////////////////////
+
+app.delete('/movies/:id', async (req,res)=>{
+    let indexSelected = req.params.id;
+   
+    
+    try{
+        await Movie.findByIdAndDelete(indexSelected);
+        res.json({message: "success"})
+    }catch(error){
+        res.json({status:404,error:true,message:"error deleting"})
+        console.log(error)
+    }
+    
+  })
+
+
+////////////////////////////////////////////////////////////////////////
 
 
 app.get('/movies/update/:id', (req,res)=>{
@@ -243,6 +393,27 @@ app.put('/movies/update/:id', (req,res)=>{
     res.status(200).json(movies)
 })
 
+////////////////////////////////////////////////////////////
+
+app.put('/movies/:id', async (req,res)=>{
+    let indexSelected = req.params.id;
+    const updatedata = req.body;
+    const objectIdLike = indexSelected.padStart(24, '0');
+    try{
+        await Movie.findByIdAndUpdate(indexSelected,updatedata,{new:true});
+        res.json(updatedata)
+    }catch(error){
+        res.json({status:404,error:true,message:"error updating"})
+        console.log(error)
+    }
+    
+  })
 
 
-app.listen(3002);
+
+
+  
+//////////////////////////////////////////////////////////////
+
+
+
