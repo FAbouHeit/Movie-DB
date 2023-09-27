@@ -128,7 +128,7 @@ app.get('/movies/read', (req,res)=>{
     res.status(200).json({status:200, data: movies })
 })
 ////////////////////////////////////////////////////////////
-app.get('/movies', async (req,res)=>{
+app.get('/movies',async (req,res)=>{
     // let indexSelected = req.params.id;
    
     
@@ -295,7 +295,7 @@ app.post('/movies',(req,res)=>{
 
 
 
-app.get('/movies/delete/:id', (req,res)=>{
+app.get('/movies/delete/:id', isAuthenticated,(req,res)=>{
     let indexSelected = parseInt(req.params.id)
     // console.log(indexSelected)
     if(indexSelected>movies.length || indexSelected<1){
@@ -306,7 +306,7 @@ app.get('/movies/delete/:id', (req,res)=>{
     }
 })
 
-app.delete('/movies/delete/:id', (req,res)=>{
+app.delete('/movies/delete/:id', isAuthenticated,(req,res)=>{
     let indexSelected = parseInt(req.params.id)
     // console.log(indexSelected)
     if(indexSelected>movies.length || indexSelected<1){
@@ -319,7 +319,7 @@ app.delete('/movies/delete/:id', (req,res)=>{
 
 ////////////////////////////////////////////////////////////////////////
 
-app.delete('/movies/:id', async (req,res)=>{
+app.delete('/movies/:id', isAuthenticated,async (req,res)=>{
     let indexSelected = req.params.id;
    
     
@@ -337,7 +337,7 @@ app.delete('/movies/:id', async (req,res)=>{
 ////////////////////////////////////////////////////////////////////////
 
 
-app.get('/movies/update/:id', (req,res)=>{
+app.get('/movies/update/:id', isAuthenticated,(req,res)=>{
     let indexSelected = parseInt(req.params.id)
 
     let mynewtitle=req.query.title;
@@ -369,7 +369,7 @@ app.get('/movies/update/:id', (req,res)=>{
 })
 
 
-app.put('/movies/update/:id', (req,res)=>{
+app.put('/movies/update/:id', isAuthenticated,(req,res)=>{
     let indexSelected = parseInt(req.params.id);
     // let indexSelected =req.params.id;
     let mynewtitle=req.body.title;
@@ -395,7 +395,7 @@ app.put('/movies/update/:id', (req,res)=>{
 
 ////////////////////////////////////////////////////////////
 
-app.put('/movies/:id', async (req,res)=>{
+app.put('/movies/:id', isAuthenticated,async (req,res)=>{
     let indexSelected = req.params.id;
     const updatedata = req.body;
     const objectIdLike = indexSelected.padStart(24, '0');
@@ -417,3 +417,70 @@ app.put('/movies/:id', async (req,res)=>{
 
 
 
+// const router = express.Router();
+
+const users = [
+  { username: 'fuad', password: 'fuad123' },
+  { username: 'sami', password: 'sami123' }
+];
+
+function isAuthenticated(req, res, next){
+
+    const { username, password } = req.headers;
+  const user = users.find((u) => u.username === username && u.password === password);
+  if (user) {
+    next();
+  } else {
+    res.status(404).json({ message: "error" });
+  }
+}
+
+app.get('/users/add', (req, res) => {
+    let newusername = req.query.username;
+    let newpassword = req.query.password;
+    if(!newusername || !newpassword ){
+    res.json({message: "error adding user"})
+    } else{
+        users.push({username: newusername, password:newpassword })
+        res.json({success:"added successfully"})
+    }
+  });
+
+  app.get('/users', (req, res) => {
+   
+        res.json(users)
+
+  });
+
+
+
+app.get('/users/update/:id', (req, res) => {
+    let id = req.params.id;
+
+    let newusername = req.query.username;
+    let newpassword = req.query.password;
+
+    if(!id){
+    res.json({message: "error updating user"})
+    } else{
+        
+        if(newusername){
+            users[id].username = newusername;
+        }
+        if(newpassword){
+            users[id].password = newpassword;
+        }
+        res.json({success:"updated successfully"})
+    }
+  });
+
+  app.get('users/delete/:id', (req,res)=>{
+    let id  =req.params.id;
+
+    if(!id){
+        res.json({message: "error with the id"})
+    } else{
+        users.slice(id-1,1);
+        res.json({message: "user removed successfully"})
+    }
+  })
