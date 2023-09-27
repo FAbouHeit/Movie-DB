@@ -2,6 +2,12 @@ const express = require('express');
 const app = express();
 // app.use(express.json);
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+///////////////////
+
 const time = new Date();
 const timeDisplay = `${time.getHours()}:${time.getSeconds()}`
 
@@ -122,6 +128,41 @@ app.get('/movies/add', (req,res)=>{
 
 })
 
+app.post('/movies/add', (req,res)=>{
+   
+    let myNewtitle=req.body.title;
+    let myNewyear = req.body.year;
+    let myNewrating = parseFloat(req.body.rating) || 4;
+  
+//   console.log(typeof(myNewtitle),myNewtitle)
+//   console.log(typeof(myNewyear), myNewyear.length,myNewyear)
+//   console.log(typeof(myNewrating),myNewrating)
+//   console.log(typeof(req.body.year.toString()),req.body.year.toString().length,req.body.year.toString())
+
+
+    if(!myNewtitle || !myNewyear){
+        res.status(403).json({status:403, error:true, 
+            message:'you cannot create a movie without providing a title and a year'})
+    }
+   
+else if(req.body.year.toString().length !==4 ){
+            res.status(403).json({status:403, error:true, 
+                message:'you cannot create a movie without providing a title and a year'})
+    }
+else{
+
+      if(myNewrating>10 || myNewrating<0) {
+        myNewrating=4;
+    }
+// 
+ 
+         const newMovie = {title : myNewtitle, year:myNewyear, rating: myNewrating}
+        movies.push(newMovie)
+ 
+        res.status(200).json(movies)
+}
+})
+
 
 app.get('/movies/delete/:id', (req,res)=>{
     let indexSelected = parseInt(req.params.id)
@@ -133,6 +174,18 @@ app.get('/movies/delete/:id', (req,res)=>{
         res.status(200).json(movies)
     }
 })
+
+app.delete('/movies/delete/:id', (req,res)=>{
+    let indexSelected = parseInt(req.params.id)
+    // console.log(indexSelected)
+    if(indexSelected>movies.length || indexSelected<1){
+        res.status(404).json({status:404, error:true, message:'the movie <ID> does not exist'})
+    } else{
+        movies.splice(indexSelected-1, 1);
+        res.status(200).json(movies)
+    }
+})
+
 
 app.get('/movies/update/:id', (req,res)=>{
     let indexSelected = parseInt(req.params.id)
@@ -155,6 +208,31 @@ app.get('/movies/update/:id', (req,res)=>{
         movies[indexSelected-1].title = mynewtitle;
     } 
      if(req.query.year && req.query.year.length ===4){
+        movies[indexSelected-1].year = mynewyear;
+    } 
+     if(mynewrating != undefined && mynewrating>=0 && mynewrating <11){
+        movies[indexSelected-1].rating = mynewrating;
+    }
+}
+
+    res.status(200).json(movies)
+})
+
+
+app.put('/movies/update/:id', (req,res)=>{
+    let indexSelected = parseInt(req.params.id);
+    // let indexSelected =req.params.id;
+    let mynewtitle=req.body.title;
+    let mynewyear = parseInt(req.body.year);
+    let mynewrating = parseFloat(req.body.rating);
+  
+    if(indexSelected>movies.length || indexSelected<1){
+        res.status(404).json({status:404, error:true, message:'the movie <ID> does not exist'})
+    } else{
+     if(req.body.title){
+        movies[indexSelected-1].title = mynewtitle;
+    } 
+     if(req.body.year && req.body.year.toString().length ===4){
         movies[indexSelected-1].year = mynewyear;
     } 
      if(mynewrating != undefined && mynewrating>=0 && mynewrating <11){
